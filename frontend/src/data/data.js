@@ -1,11 +1,13 @@
 export const header = {
-  logo: 'Название',
-  phone: '+7 (000) XXX-XX-XX',
+  logoSrc:  '/images/logo.png',
+  logoAlt:  'Логотип компании',
+  name:     'Название',
+  phone:    '+7 (000) XXX-XX-XX',
   menu: [
     { label: 'О компании', to: '/about' },
-    { label: 'Услуги', to: '/services', hasDropdown: true },
-    { label: 'Проекты', to: '/projects' },
-    { label: 'Контакты', to: '/contacts' },
+    { label: 'Услуги',     to: '/services', hasDropdown: true },
+    { label: 'Проекты',    to: '/projects' },
+    { label: 'Контакты',   to: '/contacts' },
   ],
 }
 
@@ -32,14 +34,7 @@ export const heroBlock = {
 }
 
 // Заготовки для будущих секций
-export const aboutBlock = {}
-
-export const servicesBlock = {
-  items: [],
-}
-
-export const projectsBlock = {
-  items: [],
-}
-
+export const aboutBlock    = {}
+export const servicesBlock = { items: [] }
+export const projectsBlock = { items: [] }
 export const contactsBlock = {}

@@ -103,17 +103,26 @@ onMounted(() => {
 
 /* ═══════════════════════════════════════════════════════════
    OVERLAY
+   Двойной градиент: левый угол темнее для читаемости текста,
+   низ затемнён под статистику.
 ═══════════════════════════════════════════════════════════ */
 
 .hero__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.45) 0%,
-    rgba(0, 0, 0, 0.55) 60%,
-    rgba(0, 0, 0, 0.72) 100%
-  );
+  background:
+    linear-gradient(
+      110deg,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.50) 45%,
+      rgba(0, 0, 0, 0.25) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.25) 0%,
+      rgba(0, 0, 0, 0.40) 55%,
+      rgba(0, 0, 0, 0.82) 100%
+    );
   z-index: 1;
 }
 
@@ -175,8 +184,8 @@ onMounted(() => {
 .hero__text {
   opacity: 0;
   transform: translateY(30px);
-  padding: 0 3.5rem 2.5rem;
-  max-width: 52rem;
+  padding: 0 3.5rem 2.8rem;
+  max-width: 68rem;
 }
 
 .hero__content.is-visible {
@@ -189,19 +198,22 @@ onMounted(() => {
 
 .hero__title {
   color: #ffffff;
-  font-size: clamp(1.6rem, 3vw, 2.8rem);
+  font-size: clamp(2rem, 4.5vw, 4rem);
   font-weight: 600;
-  line-height: 1.22;
-  letter-spacing: -0.025em;
-  margin: 0 0 0.9rem;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.1rem;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55), 0 1px 8px rgba(0, 0, 0, 0.35);
 }
 
 .hero__description {
-  color: rgba(255, 255, 255, 0.65);
-  font-size: clamp(0.85rem, 1.25vw, 1rem);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-weight: 400;
   line-height: 1.75;
-  max-width: 36rem;
+  max-width: 40rem;
   margin: 0;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* ── Статистика ──────────────────────────────────── */
@@ -215,7 +227,7 @@ onMounted(() => {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid rgba(255, 255, 255, 0.07);
-  padding: 1.9rem 3.5rem;
+  padding: 2rem 3.5rem;
 }
 
 .hero__content.is-visible .hero__stats {
