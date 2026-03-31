@@ -1,0 +1,6 @@
+﻿<template>
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="text-2xl font-semibold tracking-tight">About</h2>
+    <p class="mt-2 text-slate-600">Стартовый Vue 3 проект для фронтенда на Vite.</p>
+  </section>
+</template>
