@@ -27,7 +27,6 @@ const skipIntro = () => {
 
   if (videoRef.value) {
     const vid = videoRef.value
-    // Seek near the end so the `ended` event fires naturally — or just reveal directly
     if (vid.duration && isFinite(vid.duration)) {
       vid.currentTime = Math.max(0, vid.duration - 0.15)
     }
@@ -85,10 +84,7 @@ onBeforeUnmount(() => {
         {{ slogan }}
       </p>
 
-      <!-- Подсказка «кликни для пропуска» — исчезает вместе со слоганами -->
-      <span class="hero__skip-hint">
-        Нажмите для пропуска
-      </span>
+      <span class="hero__skip-hint">Нажмите для пропуска</span>
     </div>
 
     <!-- ─── Основной контент (появляется после слоганов) ── -->
@@ -99,12 +95,14 @@ onBeforeUnmount(() => {
         <p  class="hero__description">{{ heroBlock.description }}</p>
       </div>
 
+      <!-- ─── Блок статистики ───────────────────────────── -->
       <div class="hero__stats">
         <div
           v-for="(stat, i) in heroBlock.stats"
           :key="i"
           class="hero__stat"
           :class="{ 'hero__stat--divided': i > 0 }"
+          :style="{ '--stat-delay': `${0.35 + i * 0.18}s` }"
         >
           <span class="hero__stat-value">{{ stat.value }}</span>
           <span class="hero__stat-text">{{ stat.text }}</span>
@@ -198,8 +196,6 @@ onBeforeUnmount(() => {
   animation: sloganReveal 2s ease both;
 }
 
-/* ── Подсказка «пропустить» ──────────────────────── */
-
 .hero__skip-hint {
   position: absolute;
   bottom: 2.5rem;
@@ -211,8 +207,8 @@ onBeforeUnmount(() => {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
-  animation: hintFade 1.2s 1.5s ease forwards;
   opacity: 0;
+  animation: hintFade 1.2s 1.5s ease forwards;
 }
 
 @keyframes hintFade {
@@ -241,6 +237,10 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
+.hero__content.is-visible {
+  pointer-events: auto;
+}
+
 /* ── Текстовый блок ──────────────────────────────── */
 
 .hero__text {
@@ -250,12 +250,8 @@ onBeforeUnmount(() => {
   max-width: 72rem;
 }
 
-.hero__content.is-visible {
-  pointer-events: auto;
-}
-
 .hero__content.is-visible .hero__text {
-  animation: slideUp 1.1s 0.1s ease forwards;
+  animation: textSlideUp 1.1s 0.1s ease forwards;
 }
 
 .hero__title {
@@ -278,27 +274,39 @@ onBeforeUnmount(() => {
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
 }
 
-/* ── Статистика ──────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   СТАТИСТИКА — glassmorphism-контейнер
+═══════════════════════════════════════════════════════════ */
 
 .hero__stats {
-  opacity: 0;
-  transform: translateY(40px);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  background: rgba(8, 8, 8, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;                               /* клипает slide-up элементов */
+
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 -8px 40px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+
   padding: 2rem 3.5rem;
 }
 
-.hero__content.is-visible .hero__stats {
-  animation: slideUp 1.1s 0.3s ease forwards;
-}
+/* ── Элемент статистики — начальное скрытое состояние ── */
 
 .hero__stat {
+  opacity: 0;
+  transform: translateY(80px);
   text-align: center;
   padding: 0 1.5rem;
+}
+
+/* ── Запуск stagger-анимации при появлении контента ── */
+
+.hero__content.is-visible .hero__stat {
+  animation: statSlideUp 0.9s var(--stat-delay, 0.35s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .hero__stat--divided {
@@ -316,7 +324,7 @@ onBeforeUnmount(() => {
 
 .hero__stat-text {
   display: block;
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(255, 255, 255, 0.52);
   font-size: clamp(0.68rem, 1vw, 0.78rem);
   line-height: 1.45;
   max-width: 130px;
@@ -327,9 +335,20 @@ onBeforeUnmount(() => {
    KEYFRAMES
 ═══════════════════════════════════════════════════════════ */
 
-@keyframes slideUp {
+@keyframes textSlideUp {
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes statSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -343,6 +362,7 @@ onBeforeUnmount(() => {
 
   .hero__stats {
     grid-template-columns: 1fr;
+    overflow: hidden;
     padding: 1.5rem;
     gap: 0;
   }
