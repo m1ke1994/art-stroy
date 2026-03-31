@@ -8,6 +8,7 @@ const SEQUENCE_DURATION = heroBlock.slogans.length * SLOGAN_DURATION + 600
 const videoRef      = ref(null)
 const contentReady  = ref(false)
 const introFinished = ref(false)
+const videoReady    = ref(false)   // ← плавное появление видео поверх постера
 
 let revealTimer = null
 
@@ -19,11 +20,7 @@ const reveal = () => {
 
 const skipIntro = () => {
   if (introFinished.value) return
-
-  if (revealTimer) {
-    clearTimeout(revealTimer)
-    revealTimer = null
-  }
+  if (revealTimer) { clearTimeout(revealTimer); revealTimer = null }
 
   if (videoRef.value) {
     const vid = videoRef.value
@@ -31,7 +28,6 @@ const skipIntro = () => {
       vid.currentTime = Math.max(0, vid.duration - 0.15)
     }
   }
-
   reveal()
 }
 
@@ -40,12 +36,24 @@ const handleKeyDown = (e) => {
 }
 
 onMounted(() => {
-  revealTimer = setTimeout(reveal, SEQUENCE_DURATION)
+  const vid = videoRef.value
 
-  videoRef.value?.addEventListener('ended', () => {
-    if (revealTimer) { clearTimeout(revealTimer); revealTimer = null }
-    reveal()
-  })
+  // ── Видео оптимизация ────────────────────────────
+  if (vid) {
+    // Плавно показать видео как только оно готово к воспроизведению
+    vid.addEventListener('canplay', () => {
+      videoReady.value = true
+    }, { once: true })
+
+    // Завершение видео → показать контент
+    vid.addEventListener('ended', () => {
+      if (revealTimer) { clearTimeout(revealTimer); revealTimer = null }
+      reveal()
+    })
+  }
+
+  // Таймер-fallback: показать контент когда завершатся слоганы
+  revealTimer = setTimeout(reveal, SEQUENCE_DURATION)
 
   document.addEventListener('keydown', handleKeyDown)
 })
@@ -59,21 +67,28 @@ onBeforeUnmount(() => {
 <template>
   <section class="hero" @click="skipIntro">
 
-    <!-- ─── Фоновое видео ───────────────────────────────── -->
+    <!-- ─── Постер (показывается пока видео грузится) ─── -->
+    <div
+      class="hero__poster"
+      :style="{ backgroundImage: `url(${heroBlock.posterSrc})` }"
+    />
+
+    <!-- ─── Фоновое видео ───────────────────────────── -->
     <video
       ref="videoRef"
       class="hero__video"
+      :class="{ 'is-ready': videoReady }"
       :src="heroBlock.videoSrc"
       autoplay
       muted
       playsinline
-      preload="auto"
+      preload="metadata"
     />
 
-    <!-- ─── Overlay-затемнение ─────────────────────────── -->
+    <!-- ─── Overlay-затемнение ──────────────────────── -->
     <div class="hero__overlay" />
 
-    <!-- ─── Слоганы (CSS-таймлайн) ────────────────────── -->
+    <!-- ─── Слоганы (CSS-таймлайн) ──────────────────── -->
     <div class="hero__slogans" :class="{ 'is-done': contentReady }">
       <p
         v-for="(slogan, i) in heroBlock.slogans"
@@ -83,11 +98,10 @@ onBeforeUnmount(() => {
       >
         {{ slogan }}
       </p>
-
       <span class="hero__skip-hint">Нажмите для пропуска</span>
     </div>
 
-    <!-- ─── Основной контент (появляется после слоганов) ── -->
+    <!-- ─── Основной контент ─────────────────────────── -->
     <div class="hero__content" :class="{ 'is-visible': contentReady }">
 
       <div class="hero__text">
@@ -95,7 +109,6 @@ onBeforeUnmount(() => {
         <p  class="hero__description">{{ heroBlock.description }}</p>
       </div>
 
-      <!-- ─── Блок статистики ───────────────────────────── -->
       <div class="hero__stats">
         <div
           v-for="(stat, i) in heroBlock.stats"
@@ -129,7 +142,22 @@ onBeforeUnmount(() => {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   ВИДЕО
+   ПОСТЕР — статичная подложка пока видео не готово
+═══════════════════════════════════════════════════════════ */
+
+.hero__poster {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  /* Чуть притемнён сам по себе — overlay дополнительно затемняет */
+  filter: brightness(0.55);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ВИДЕО — плавно появляется поверх постера
 ═══════════════════════════════════════════════════════════ */
 
 .hero__video {
@@ -138,7 +166,16 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 0;
+  z-index: 1;
+  /* Скрыто до события canplay */
+  opacity: 0;
+  transition: opacity 1s ease;
+  /* Исключаем из потока GPU-перерисовок */
+  will-change: opacity;
+}
+
+.hero__video.is-ready {
+  opacity: 1;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -161,7 +198,7 @@ onBeforeUnmount(() => {
       rgba(0, 0, 0, 0.40) 55%,
       rgba(0, 0, 0, 0.82) 100%
     );
-  z-index: 1;
+  z-index: 2;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -275,7 +312,7 @@ onBeforeUnmount(() => {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   СТАТИСТИКА — glassmorphism-контейнер
+   СТАТИСТИКА — glassmorphism
 ═══════════════════════════════════════════════════════════ */
 
 .hero__stats {
@@ -290,10 +327,8 @@ onBeforeUnmount(() => {
   box-shadow:
     0 -8px 40px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
-
   padding: 2rem 3.5rem;
 
-  /* Скрыт до завершения вступления */
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.5s ease, visibility 0s 0.5s;
@@ -305,7 +340,7 @@ onBeforeUnmount(() => {
   transition: opacity 0.5s ease, visibility 0s 0s;
 }
 
-/* ── Элемент статистики — начальное скрытое состояние ── */
+/* ── Элемент статистики ──────────────────────────── */
 
 .hero__stat {
   opacity: 0;
@@ -313,8 +348,6 @@ onBeforeUnmount(() => {
   text-align: center;
   padding: 0 1.5rem;
 }
-
-/* ── Запуск stagger-анимации при появлении контента ── */
 
 .hero__content.is-visible .hero__stat {
   animation: statSlideUp 0.9s var(--stat-delay, 0.35s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -352,14 +385,8 @@ onBeforeUnmount(() => {
 }
 
 @keyframes statSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(80px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(80px); }
+  to   { opacity: 1; transform: translateY(0);    }
 }
 
 /* ═══════════════════════════════════════════════════════════
