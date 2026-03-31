@@ -1,28 +1,64 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { heroBlock } from '@/data/data.js'
 
-// Длительность одного слогана (мс) × кол-во слоганов + небольшой буфер
 const SLOGAN_DURATION   = 2000
 const SEQUENCE_DURATION = heroBlock.slogans.length * SLOGAN_DURATION + 600
 
-const videoRef     = ref(null)
-const contentReady = ref(false)
+const videoRef      = ref(null)
+const contentReady  = ref(false)
+const introFinished = ref(false)
+
+let revealTimer = null
+
+const reveal = () => {
+  if (introFinished.value) return
+  introFinished.value = true
+  contentReady.value  = true
+}
+
+const skipIntro = () => {
+  if (introFinished.value) return
+
+  if (revealTimer) {
+    clearTimeout(revealTimer)
+    revealTimer = null
+  }
+
+  if (videoRef.value) {
+    const vid = videoRef.value
+    // Seek near the end so the `ended` event fires naturally — or just reveal directly
+    if (vid.duration && isFinite(vid.duration)) {
+      vid.currentTime = Math.max(0, vid.duration - 0.15)
+    }
+  }
+
+  reveal()
+}
+
+const handleKeyDown = (e) => {
+  if (e.key === 'Enter') skipIntro()
+}
 
 onMounted(() => {
-  const reveal = () => { contentReady.value = true }
-
-  const timer = setTimeout(reveal, SEQUENCE_DURATION)
+  revealTimer = setTimeout(reveal, SEQUENCE_DURATION)
 
   videoRef.value?.addEventListener('ended', () => {
-    clearTimeout(timer)
+    if (revealTimer) { clearTimeout(revealTimer); revealTimer = null }
     reveal()
   })
+
+  document.addEventListener('keydown', handleKeyDown)
+})
+
+onBeforeUnmount(() => {
+  if (revealTimer) { clearTimeout(revealTimer); revealTimer = null }
+  document.removeEventListener('keydown', handleKeyDown)
 })
 </script>
 
 <template>
-  <section class="hero">
+  <section class="hero" @click="skipIntro">
 
     <!-- ─── Фоновое видео ───────────────────────────────── -->
     <video
@@ -48,6 +84,11 @@ onMounted(() => {
       >
         {{ slogan }}
       </p>
+
+      <!-- Подсказка «кликни для пропуска» — исчезает вместе со слоганами -->
+      <span class="hero__skip-hint">
+        Нажмите для пропуска
+      </span>
     </div>
 
     <!-- ─── Основной контент (появляется после слоганов) ── -->
@@ -86,6 +127,7 @@ onMounted(() => {
   width: 100%;
   overflow: hidden;
   background: #080808;
+  cursor: default;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -103,8 +145,6 @@ onMounted(() => {
 
 /* ═══════════════════════════════════════════════════════════
    OVERLAY
-   Двойной градиент: левый угол темнее для читаемости текста,
-   низ затемнён под статистику.
 ═══════════════════════════════════════════════════════════ */
 
 .hero__overlay {
@@ -158,6 +198,28 @@ onMounted(() => {
   animation: sloganReveal 2s ease both;
 }
 
+/* ── Подсказка «пропустить» ──────────────────────── */
+
+.hero__skip-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: hintFade 1.2s 1.5s ease forwards;
+  opacity: 0;
+}
+
+@keyframes hintFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 @keyframes sloganReveal {
   0%   { opacity: 0; transform: translateY(18px) scale(0.97); filter: blur(8px);  }
   16%  { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0);    }
@@ -185,7 +247,7 @@ onMounted(() => {
   opacity: 0;
   transform: translateY(30px);
   padding: 0 3.5rem 2.8rem;
-  max-width: 68rem;
+  max-width: 72rem;
 }
 
 .hero__content.is-visible {
@@ -198,22 +260,22 @@ onMounted(() => {
 
 .hero__title {
   color: #ffffff;
-  font-size: clamp(2rem, 4.5vw, 4rem);
+  font-size: clamp(2.4rem, 5.5vw, 5rem);
   font-weight: 600;
-  line-height: 1.18;
+  line-height: 1.15;
   letter-spacing: -0.03em;
-  margin: 0 0 1.1rem;
-  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55), 0 1px 8px rgba(0, 0, 0, 0.35);
+  margin: 0 0 1.25rem;
+  text-shadow: 0 2px 32px rgba(0, 0, 0, 0.6), 0 1px 8px rgba(0, 0, 0, 0.4);
 }
 
 .hero__description {
   color: rgba(255, 255, 255, 0.72);
-  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  font-size: clamp(1.05rem, 1.9vw, 1.35rem);
   font-weight: 400;
-  line-height: 1.75;
-  max-width: 40rem;
+  line-height: 1.72;
+  max-width: 42rem;
   margin: 0;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
 }
 
 /* ── Статистика ──────────────────────────────────── */
@@ -304,6 +366,10 @@ onMounted(() => {
 @media (max-width: 480px) {
   .hero__slogan {
     letter-spacing: 0.1em;
+  }
+
+  .hero__skip-hint {
+    display: none;
   }
 }
 </style>

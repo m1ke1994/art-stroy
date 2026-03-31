@@ -13,14 +13,13 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
   <header class="hdr">
     <div class="hdr__inner">
 
-      <!-- ── Бренд-блок: лого + название ──────────── -->
+      <!-- ── Бренд-блок: только логотип ───────────── -->
       <RouterLink to="/" class="hdr__brand" @click="closeMobile">
         <img
           :src="header.logoSrc"
           :alt="header.logoAlt"
           class="hdr__logo"
         />
-        <span class="hdr__name">{{ header.name }}</span>
       </RouterLink>
 
       <!-- ── Правая часть: меню + телефон ─────────── -->
@@ -122,31 +121,21 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
 }
 
 /* ═══════════════════════════════════════════════════════
-   БРЕНД-БЛОК
+   БРЕНД-БЛОК (только логотип)
 ═══════════════════════════════════════════════════════ */
 
 .hdr__brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
   text-decoration: none;
   flex-shrink: 0;
 }
 
 .hdr__logo {
-  height: 34px;
+  height: 100px;
   width: auto;
   object-fit: contain;
   display: block;
-}
-
-.hdr__name {
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-  line-height: 1;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -171,7 +160,7 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
   font-weight: 400;
   letter-spacing: 0.01em;
   text-decoration: none;
-  padding-bottom: 3px;
+  padding-bottom: 4px;
   transition: color 0.25s ease;
   white-space: nowrap;
 }
@@ -183,18 +172,18 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
   left: 0;
   right: 0;
   height: 1px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.75);
   transform: scaleX(0);
   transform-origin: left center;
   transition: transform 0.3s ease;
 }
 
 .hdr__link:hover {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .hdr__link:hover::after {
-  transform: scaleX(0.35);
+  transform: scaleX(1);
 }
 
 .hdr__link--active {
@@ -203,7 +192,7 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
 
 .hdr__link--active::after {
   transform: scaleX(1);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 /* ── Шеврон у «Услуги» ───────────────────────────── */
@@ -218,7 +207,7 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
 
 .hdr__link:hover .hdr__chevron,
 .hdr__link--active .hdr__chevron {
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 /* ── Телефон ─────────────────────────────────────── */
@@ -371,12 +360,8 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
 }
 
 @media (max-width: 400px) {
-  .hdr__name {
-    font-size: 0.9rem;
-  }
-
   .hdr__logo {
-    height: 28px;
+    height: 38px;
   }
 }
 </style>
