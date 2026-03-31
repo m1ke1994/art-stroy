@@ -1,5 +1,69 @@
 @import 'tailwindcss';
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
+  min-height: 100vh;
+  background-color: #06060e;
+
+  color: #ffffff;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+  bg.webp — отдельный GPU-слой через position:fixed.
+  В отличие от background-attachment:fixed, этот слой
+  не вызывает перерисовку всей страницы при скролле.
+*/
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/images/bg.webp');
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  will-change: transform;
+  z-index: -2;
+}
+
+/* Тёмный overlay поверх bg */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: -1;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
 }

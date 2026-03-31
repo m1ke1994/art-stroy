@@ -36,7 +36,7 @@ export const heroBlock = {
 
 export const aboutBlock = {
   sectionId:  'about',
-  background: '/images/bg.png',
+  background: '/images/bg.jpg',
   heading:    'История нашей компании',
   subheading: 'Наш путь развития от металлоконструкций до комплексного проектирования',
 

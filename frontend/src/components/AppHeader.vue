@@ -106,10 +106,10 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(6, 6, 6, 0.55);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(8, 8, 8, 0.75);
+  backdrop-filter: blur(20px) saturate(1.0);
+  -webkit-backdrop-filter: blur(20px) saturate(1.0);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .hdr__inner {
@@ -276,9 +276,9 @@ const rawPhone = header.phone.replace(/[\s()\-]/g, '')
 .hdr__mobile {
   display: none;
   flex-direction: column;
-  background: rgba(6, 6, 6, 0.96);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(8, 8, 8, 0.97);
+  backdrop-filter: blur(20px) saturate(1.0);
+  -webkit-backdrop-filter: blur(20px) saturate(1.0);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
   max-height: 0;

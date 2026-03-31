@@ -35,9 +35,7 @@ onBeforeUnmount(() => {
     :id="aboutBlock.sectionId"
     ref="sectionRef"
     class="about"
-    :style="{ backgroundImage: `url(${aboutBlock.background})` }"
   >
-    <div class="about__overlay" />
 
     <div class="about__wrap">
 
@@ -104,28 +102,12 @@ onBeforeUnmount(() => {
 ═══════════════════════════════════════════════════════════ */
 
 .about {
-  position: relative;
   padding: 7rem 2rem 6rem;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.about__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(4, 4, 4, 0.82) 0%,
-    rgba(4, 4, 4, 0.70) 50%,
-    rgba(4, 4, 4, 0.85) 100%
-  );
-  pointer-events: none;
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .about__wrap {
-  position: relative;
-  z-index: 1;
   max-width: 1240px;
   margin: 0 auto;
 }

@@ -73,6 +73,9 @@ onBeforeUnmount(() => {
       :style="{ backgroundImage: `url(${heroBlock.posterSrc})` }"
     />
 
+    <!-- ─── Мобильное фоновое изображение (только mobile) ─── -->
+    <div class="hero__mobile-image" />
+
     <!-- ─── Фоновое видео ───────────────────────────── -->
     <video
       ref="videoRef"
@@ -254,10 +257,10 @@ onBeforeUnmount(() => {
 }
 
 @keyframes sloganReveal {
-  0%   { opacity: 0; transform: translateY(18px) scale(0.97); filter: blur(8px);  }
-  16%  { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0);    }
-  72%  { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0);    }
-  100% { opacity: 0; transform: translateY(-12px) scale(0.98); filter: blur(6px); }
+  0%   { opacity: 0; transform: translateY(18px) scale(0.97); }
+  16%  { opacity: 1; transform: translateY(0)    scale(1);    }
+  72%  { opacity: 1; transform: translateY(0)    scale(1);    }
+  100% { opacity: 0; transform: translateY(-12px) scale(0.98); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -393,7 +396,25 @@ onBeforeUnmount(() => {
    MOBILE
 ═══════════════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════════════
+   МОБИЛЬНОЕ ИЗОБРАЖЕНИЕ (только mobile, desktop не трогаем)
+═══════════════════════════════════════════════════════════ */
+
+.hero__mobile-image {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: url('/images/mobile_hero.png') center / cover no-repeat;
+  z-index: 1;
+}
+
 @media (max-width: 768px) {
+  /* Показываем мобильное изображение */
+  .hero__mobile-image { display: block; }
+  /* Скрываем десктопный постер и видео */
+  .hero__poster { display: none; }
+  .hero__video  { display: none !important; opacity: 0 !important; }
+
   .hero__text {
     padding: 0 1.5rem 2rem;
   }

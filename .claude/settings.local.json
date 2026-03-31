@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.\\(vue|js|ts|json|css|scss\\)$\")",
+      "Bash(node -e \"const fs = require\\(''fs''\\); [''src/router/index.js'',''src/views/HomeView.vue''].forEach\\(f => console.log\\(''=== '' + f + '' ===\\\\n'' + fs.readFileSync\\(f,''utf8''\\).slice\\(0,400\\) + ''\\\\n''\\)\\)\")"
+    ]
+  }
+}

@@ -61,7 +61,9 @@
 body {
   min-height: 100vh;
   color: var(--color-text);
-  background: var(--color-background);
+  /* Global background — visible through all semi-transparent sections */
+  background: url('/images/bg.webp') center / cover fixed no-repeat;
+  background-color: #06060e;
   transition:
     color 0.5s,
     background-color 0.5s;
