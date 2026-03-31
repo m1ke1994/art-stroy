@@ -281,7 +281,7 @@ onBeforeUnmount(() => {
 .hero__stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  overflow: hidden;                               /* клипает slide-up элементов */
+  overflow: hidden;
 
   background: rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(20px) saturate(1.4);
@@ -292,6 +292,17 @@ onBeforeUnmount(() => {
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
 
   padding: 2rem 3.5rem;
+
+  /* Скрыт до завершения вступления */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0s 0.5s;
+}
+
+.hero__content.is-visible .hero__stats {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease, visibility 0s 0s;
 }
 
 /* ── Элемент статистики — начальное скрытое состояние ── */
